@@ -11,10 +11,10 @@ use vello::peniko::{color::palette, Color};
 use vello::util::{RenderContext, RenderSurface};
 use vello::{AaConfig, Renderer, RendererOptions, Scene};
 use winit::application::ApplicationHandler;
+use winit::dpi::PhysicalSize;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowAttributes, WindowId};
-use winit::dpi::PhysicalSize;
 
 use vello::wgpu;
 
@@ -52,15 +52,20 @@ impl ApplicationHandler for VelloClient<'_> {
 
                 // Draw the output into the scene.
                 let start = Instant::now();
-				self.scene.reset();
-				let rect = Rect::new(MARGIN, MARGIN, width as f64 - MARGIN * 2.0, height as f64 - MARGIN * 2.0);
-        		self.scene.stroke(
-            		&Stroke::new(1.0),
-            		Affine::IDENTITY,
-            		Color::BLACK,
-            		None,
-            		&rect,
-        		);
+                self.scene.reset();
+                let rect = Rect::new(
+                    MARGIN,
+                    MARGIN,
+                    width as f64 - MARGIN * 2.0,
+                    height as f64 - MARGIN * 2.0,
+                );
+                self.scene.stroke(
+                    &Stroke::new(1.0),
+                    Affine::IDENTITY,
+                    Color::BLACK,
+                    None,
+                    &rect,
+                );
 
                 // Get a handle to the device
                 let device_handle = &self.context.devices[self.surface.dev_id];
@@ -180,11 +185,11 @@ fn window_attributes() -> WindowAttributes {
 pub fn start_app() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     console_log::init().expect("could not initialize logger");
-	if let Err(e) = run_app() {
-    	info!("run_app error: {}", e);
-	} else {
-    	info!("run_app exit with no error");
-	}
+    if let Err(e) = run_app() {
+        info!("run_app error: {}", e);
+    } else {
+        info!("run_app exit with no error");
+    }
 }
 
 pub fn run_app() -> Result<(), Box<dyn std::error::Error>> {
@@ -215,12 +220,13 @@ pub fn run_app() -> Result<(), Box<dyn std::error::Error>> {
             })
             .unwrap();
         info!("Window {} x {}, scale {}", width, height, scale_factor);
-        let size: PhysicalSize<u32> = PhysicalSize::from_logical::<_, f64>((width, height), scale_factor);
-        if let Some(sz) =  window.request_inner_size(size) {
-			info!("Request inner size: {} x {}", sz.width, sz.height);
-		} else {
-			info!("Resize deferred");
-		}
+        let size: PhysicalSize<u32> =
+            PhysicalSize::from_logical::<_, f64>((width, height), scale_factor);
+        if let Some(sz) = window.request_inner_size(size) {
+            info!("Request inner size: {} x {}", sz.width, sz.height);
+        } else {
+            info!("Resize deferred");
+        }
         info!("scaled size {} x {}", size.width, size.height);
         let surface = render_cx
             .create_surface(
@@ -237,5 +243,5 @@ pub fn run_app() -> Result<(), Box<dyn std::error::Error>> {
             _ = display_error_message();
         }
     });
-	Ok(())
+    Ok(())
 }
